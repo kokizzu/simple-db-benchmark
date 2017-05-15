@@ -61,6 +61,7 @@ func main() {
 					break
 				}
 			}
+			iter.Close()
 		}
 		for x := 1; x < max; x += y {
 			iter := db.Query(fmt.Sprintf(`SELECT k, v FROM test4 WHERE bucket = 'foo' AND k <= '%05d' ORDER BY k DESC LIMIT 20`, x)).Consistency(gocql.One).Iter()
@@ -70,6 +71,7 @@ func main() {
 					break
 				}
 			}
+			iter.Close()
 		}
 		fmt.Print(`.`)
 	}
