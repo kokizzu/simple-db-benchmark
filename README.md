@@ -22,7 +22,7 @@ EOF
 # test3: cockroachdb
 cockroach start --insecure
 cockroach sql --insecure
-CREATE DATABASE test4;
+CREATE DATABASE test3;
 
 # test4: scylladb
 dir=`pwd`
@@ -31,7 +31,7 @@ mkdir -p $dir/scylla$x/commitlog $dir/scylla$x/data
 docker stop scylla$x
 docker rm scylla$x
 docker run --volume $dir/scylla$x:/var/lib/scylla --name scylla$x \
-  -d scylladb/scylla --developer-mode 1 --memory 1G --smp 2
+  -d scylladb/scylla --developer-mode 1 --memory 4G --smp 4
 docker logs scylla$x | tail
 sleep 2;
 docker exec -it scylla$x nodetool status
