@@ -10,7 +10,7 @@ func main() {
 	
 	db := sqlx.MustConnect(`postgres`, `postgresql://test3@localhost:26257/test3?sslmode=disable`)
 	var err error
-	fmt.Println(`test3: cockroach`)
+	fmt.Println(`test3: cockroachdb`)
 	_, err = db.Exec(`CREATE TABLE test3 (id BIGSERIAL PRIMARY KEY, k TEXT UNIQUE, v TEXT)`)
 	if err != nil {
 		_, err = db.Exec(`TRUNCATE TABLE test3`)
