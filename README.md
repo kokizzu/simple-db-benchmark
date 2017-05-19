@@ -1,6 +1,7 @@
 # simple-db-benchmark
 
-Testing PostgreSQL 9.6.2, ScyllaDB 1.6.4, CockroachDB 1.0, result: http://kokizzu.blogspot.sg/2017/05/postgresql-vs-cockroachdb-vs-scylladb.html
+* [PostgreSQL 9.6.2 vs ScyllaDB 1.6.4 vs CockroachDB 1.0](http://kokizzu.blogspot.sg/2017/05/postgresql-vs-cockroachdb-vs-scylladb.html)
+* [PostgreSQL 9.6.2 vs ScyllaDB 1.7RC2](http://kokizzu.blogspot.co.id/2017/05/postgresql-962-vs-scylladb-17rc2.html) 
 
 ## Preparation
 
