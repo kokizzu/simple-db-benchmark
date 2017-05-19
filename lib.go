@@ -8,9 +8,11 @@ import (
 	"sync/atomic"
 )
 
-const max = 3333
-const jump = 40
-const source = 33
+const max = 9999  // total number of data
+const jump = 40   // square root of maximum returned LIMIT query, also this number*2 is the number of parallel SELECT
+const source = 99 // number of parallel INSERT/UPDATE
+
+// note: within for loop, goroutines will not executed until runtime.Gosched() called
 
 func BenchmarkInsert(exec func(x int) error) {
 	var wg sync.WaitGroup
