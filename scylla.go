@@ -6,7 +6,7 @@ import "time"
 import "log"
 
 func main() {
-	clust := gocql.NewCluster(`172.17.0.2`)
+	clust := gocql.NewCluster(`127.0.0.1`)
 	clust.Keyspace = `test4`
 	db, err := clust.CreateSession()
 	defer db.Close()

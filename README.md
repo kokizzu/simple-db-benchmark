@@ -24,7 +24,7 @@ cockroach start --insecure
 cockroach sql --insecure
 CREATE DATABASE test3;
 
-# test4: scylladb
+# test4: scylladb (under docker)
 dir=`pwd`
 x=1
 mkdir -p $dir/scylla$x/commitlog $dir/scylla$x/data
@@ -36,5 +36,15 @@ docker logs scylla$x | tail
 sleep 2;
 docker exec -it scylla$x nodetool status
 docker exec -it scylla$x cqlsh 
+CREATE KEYSPACE test4 WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor':1};
+
+# test4: scylladb (supported: ubuntu 17.04+xfs)
+sudo wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/ubuntu/scylla-1.7-xenial.list
+sudo apt-get update
+sudo systemctl enable scylla-server
+sudo scylla_setup
+sudo sed -i 's|/usr/bin/scylla $SCYLLA_ARGS|/usr/bin/scylla -m 8G -c 8 $SCYLLA_ARGS|g' /lib/systemd/system/scylla-server.service
+sudo systemctl daemon-reload
+sudo systemctl start scylla-server # cqlsh 127.0.0.1
 CREATE KEYSPACE test4 WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor':1};
 ```
