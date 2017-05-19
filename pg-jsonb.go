@@ -3,11 +3,9 @@ package main
 import "fmt"
 import _ "github.com/lib/pq"
 import "github.com/jmoiron/sqlx"
-import "time"
 import "log"
 
 func main() {
-	
 	db := sqlx.MustConnect(`postgres`, `user=test2 dbname=test2 sslmode=disable`)
 	var err error
 	fmt.Println(`test2: postgresql jsonb`)
@@ -20,73 +18,37 @@ func main() {
 		}
 	}
 	
-	const max = 9999
-	const jump = 40
-	t := time.Now()
-	for x := 1; x <= max; x++ {
+	BenchmarkInsert(func(x int) error {
 		_, err = db.Exec(fmt.Sprintf(`INSERT INTO test2(k,v)VALUES('%05d','{"v":"%05d"}')`, x, x))
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-		if x % 200 == 0 {
-			fmt.Print(`.`)
-		}
-	}
-	dur := time.Now().Sub(t)
-	fmt.Printf("INSERT: %v (%.2f ms/op)\n", dur, float64(dur.Nanoseconds()) / 1000000 / max)
-	
-	t = time.Now()
-	for x := 1; x <= max; x++ {
+		return err
+	})
+	BenchmarkUpdate(func(x int) error {
 		_, err = db.Exec(fmt.Sprintf(`UPDATE test2 SET v = v || '{"v":"%06d"}' WHERE k = '%05d'`, x, x))
+		return err
+	})
+	BenchmarkSelect(func(x, lim int) error {
+		rows, err := db.Queryx(fmt.Sprintf(`SELECT id, k, v->>'v' FROM test2 WHERE k >= '%05d' ORDER BY k ASC LIMIT %d`, x, lim))
 		if err != nil {
-			log.Fatal(err)
-			return
+			return err
 		}
-		if x % 200 == 0 {
-			fmt.Print(`.`)
+		defer rows.Close()
+		for rows.Next() {
+			m := map[string]interface{}{}
+			rows.MapScan(m)
 		}
-	}
-	dur = time.Now().Sub(t)
-	fmt.Printf("UPDATE: %v (%.2f ms/op)\n", dur, float64(dur.Nanoseconds()) / 1000000 / max)
+		return nil
+	}, func(x, lim int) error {
+		rows, err := db.Queryx(fmt.Sprintf(`SELECT id, k, v->>'v' FROM test2 WHERE k <= '%05d' ORDER BY k DESC LIMIT %d`, x, lim))
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			m := map[string]interface{}{}
+			rows.MapScan(m)
+		}
+		return nil
+	})
 	
-	t = time.Now()
-	ops := int64(0)
-	for y := 2; y < jump; y++ {
-		for x := max - 1; x > 0; x -= y {
-			ops++
-			rows, err := db.Queryx(fmt.Sprintf(`SELECT id, k, v->>'v' FROM test2 WHERE k >= '%05d' ORDER BY k ASC LIMIT %d`, x, y * y))
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
-			for rows.Next() {
-				m := map[string]interface{}{}
-				rows.MapScan(m)
-			}
-			rows.Close()
-			if ops % 500 == 0 {
-				fmt.Print(`.`)
-			}
-		}
-		for x := 1; x < max; x += y {
-			ops++
-			rows, err := db.Queryx(fmt.Sprintf(`SELECT id, k, v->>'v' FROM test2 WHERE k <= '%05d' ORDER BY k DESC LIMIT %d`, x, y * y))
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
-			for rows.Next() {
-				m := map[string]interface{}{}
-				rows.MapScan(m)
-			}
-			rows.Close()
-			if ops % 500 == 0 {
-				fmt.Print(`.`)
-			}
-		}
-	}
-	dur = time.Now().Sub(t)
-	fmt.Printf("SELECT: %v (%.2f ms/op)\n", dur, float64(dur.Nanoseconds()) / 1000000 / float64(ops))
 }
 
