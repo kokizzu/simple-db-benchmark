@@ -1,5 +1,6 @@
 # simple-db-benchmark
 
+* [Cockroach 2.1.3](https://kokizzu.blogspot.com/2019/01/cockroachdb-213-benchmark.html)
 * [PostgreSQL 9.6.2 vs ScyllaDB 1.6.4 vs CockroachDB 1.0](http://kokizzu.blogspot.sg/2017/05/postgresql-vs-cockroachdb-vs-scylladb.html)
 * [PostgreSQL 9.6.2 vs ScyllaDB 1.7RC2](http://kokizzu.blogspot.co.id/2017/05/postgresql-962-vs-scylladb-17rc2.html) 
 
@@ -24,6 +25,7 @@ EOF
 cockroach start --insecure
 cockroach sql --insecure
 CREATE DATABASE test3;
+GRANT ALL ON DATABASE test3 TO test3;
 
 # test4: scylladb (under docker)
 dir=`pwd`
